@@ -4,7 +4,7 @@
 
 ## 最初の1回だけ
 
-1. [GitHubのReleases](https://github.com/shikasho44/dot-sprite-workshop/releases/latest)から、Assets欄の `Dot-Sprite-Workshop-Windows-v0.2.0.zip` を保存し、右クリックから「すべて展開」します。
+1. [GitHubのReleases](https://github.com/shikasho44/dot-sprite-workshop/releases/latest)から、Assets欄のWindows用ZIPを保存し、右クリックから「すべて展開」します。
 2. [Python 3.12.10のWindows installer (64-bit)](https://www.python.org/downloads/release/python-31210/#files) をインストールします。インストール画面で `py launcher` を有効にしてください。すでに64ビットのPython 3.12と `py` があればこの手順を省けます。
 3. 展開したフォルダの **Setup.cmd** をダブルクリックします。まず **C** を選ぶとCPUで動きます。CUDA 13に対応するNVIDIA GPUとドライバーがある場合は **N** を選ぶと高速化できます。
 4. `Setup complete` が出たら、同じフォルダの **Start.cmd** をダブルクリックします。ブラウザで開かなければ [ドット絵工房](http://127.0.0.1:8765/) を開きます。
@@ -36,6 +36,10 @@ Windows 10/11のx64を対象にしています。セットアップ時はイン�
 NVIDIA版を入れたPCで **Setup-Image-Editing.cmd** を実行して再起動します。推論ライブラリとFLUX.2 Klein 4B関連の重みを取得します。重みだけで約8.3 GBあり、追加で15 GB以上の空きを目安にしてください。RTX 5080 16 GBでの動作を確認しています。別のGPUや少ないVRAMでの動作は構成に依存します。導入後は「画像から作る」で「金色に」などを指定し、変換見本1枚とAI編集4案を得られます。
 
 ## 困ったとき
+
+**Diagnose.cmd** を開くと、工房を起動せずにPython・ライブラリ、GPUとCUDAの利用可否、空き容量、モデルの状態を確認できます。通常の診断はネット接続なしで実行できます。Pythonが使えない状態でも、WindowsのGPU・空き容量・モデルの有無を表示します。SHA-256照合には実行できるPythonが必要です。
+
+診断後に **R** を選ぶと基本モデルを、**I** を選ぶと追加のAI画像編集モデルを修復します。取得・復元する対象は、不足したファイルと内容が一致しないファイルだけです。取得済みの検証可能なキャッシュは再利用します。モデル取得が途中で止まった場合も、もう一度同じ修復を実行してください。PythonライブラリやComfyUI本体の初回導入は、各セットアップを使います。
 
 | 状況 | 確認すること |
 | --- | --- |

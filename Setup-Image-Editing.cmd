@@ -9,7 +9,7 @@ if not exist "%SPRITE_VENV%\Scripts\python.exe" (
 )
 "%SPRITE_VENV%\Scripts\python.exe" -X utf8 setup_models.py --image-edit
 if errorlevel 1 (
-  echo Image editing setup stopped. Check the error above, then retry.
+  echo Image editing setup stopped. Run Diagnose.cmd for details.
   pause
   exit /b 1
 )

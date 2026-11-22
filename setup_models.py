@@ -1,7 +1,9 @@
 """Fetch only the fixed upstream files required by this release."""
 
 import argparse
+from errno import EXDEV
 import hashlib
+import json
 import os
 from pathlib import Path
 import shutil
@@ -10,9 +12,7 @@ import sys
 from tempfile import TemporaryDirectory
 from urllib.request import urlopen
 from zipfile import ZipFile
-from huggingface_hub.errors import HfHubHTTPError
-
-from runtime_paths import DATA
+from runtime_paths import DATA, ROOT
 
 
 BASE = (
@@ -43,6 +43,7 @@ EDIT = (
 COMFY_REV = '8ff6dc384ba5c410266b40e137799e049459d4f2'
 DOWNLOADS = Path(os.environ.get('SPRITE_DOWNLOAD_CACHE') or
                  (Path(os.environ.get('LOCALAPPDATA') or Path.home()) / 'DotSpriteWorkshop' / 'dl'))
+INTEGRITY = json.loads((ROOT / 'model-integrity.json').read_text(encoding='utf-8'))
 
 
 def sha256(path):
@@ -50,34 +51,68 @@ def sha256(path):
         return hashlib.file_digest(file, 'sha256').hexdigest()
 
 
-def fetch_models(groups):
-    from huggingface_hub import hf_hub_download
+def inspect_file(path, spec):
+    if not path.is_file():
+        return 'missing'
+    if path.stat().st_size != spec['size'] or sha256(path) != spec['sha256']:
+        return 'damaged'
+    return 'ok'
 
+
+def model_inventory(groups, locations=None):
     for repo, revision, folder, weights, small in groups:
-        install = DATA / folder
-        # Hugging Face adds long cache filenames. Keep them away from deeply nested ZIP folders.
         bucket = hashlib.sha256(f'{repo}@{revision}'.encode()).hexdigest()[:10]
         staging = DOWNLOADS / bucket
+        install = locations.get(folder, DATA / folder) if locations else DATA / folder
         for name in [*small, *weights]:
-            expected = weights.get(name)
             dest = install / name
-            if expected and dest.is_file() and sha256(dest) == expected:
-                print(f'[OK] {name}', flush=True)
-                continue
-            print(f'[取得] {repo} / {name}', flush=True)
-            cached = staging / name
-            force = bool(expected and cached.is_file() and sha256(cached) != expected)
-            got = Path(hf_hub_download(repo_id=repo, revision=revision, filename=name, local_dir=staging,
-                                       force_download=force, token=False))
-            if expected and sha256(got) != expected:
-                raise RuntimeError(f'ファイルの照合に失敗しました: {got.name}。もう一度セットアップを実行してください。')
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            if not expected:
-                shutil.copyfile(got, dest)
-            else:
-                partial = dest.with_suffix(dest.suffix + '.partial')
-                shutil.move(got, partial)
-                partial.replace(dest)
+            spec = INTEGRITY[f'{folder}/{name}']
+            yield repo, revision, folder, name, dest, staging, spec, inspect_file(dest, spec)
+
+
+def fetch_models(groups, locations=None):
+    from filelock import FileLock, Timeout
+    from huggingface_hub import hf_hub_download
+
+    DOWNLOADS.mkdir(parents=True, exist_ok=True)
+    repaired = 0
+    try:
+        with FileLock(str(DOWNLOADS / 'repair.lock'), timeout=0):
+            for repo, revision, folder, name, dest, staging, spec, status in model_inventory(groups, locations):
+                if status == 'ok':
+                    print(f'[正常・据え置き] {folder}/{name}', flush=True)
+                    continue
+                repair_file(repo, revision, name, dest, staging, spec, hf_hub_download)
+                repaired += 1
+    except Timeout as exc:
+        raise RuntimeError('別のセットアップまたは修復が進行中です。終了後にもう一度実行してください。') from exc
+    return repaired
+
+
+def repair_file(repo, revision, name, dest, staging, spec, download):
+    cached = staging / name
+    cache_state = inspect_file(cached, spec)
+    if cache_state == 'ok':
+        print(f'[キャッシュから復元] {repo} / {name}', flush=True)
+        got = cached
+    else:
+        print(f'[取得] {repo} / {name}', flush=True)
+        got = Path(download(repo_id=repo, revision=revision, filename=name, local_dir=staging,
+                            force_download=cache_state == 'damaged', token=False))
+        if inspect_file(got, spec) != 'ok':
+            raise RuntimeError(f'取得したファイルを照合できませんでした: {name}')
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    # Atomically swap in verified bytes. Keep the cache if the destination is locked.
+    try:
+        got.replace(dest)
+    except OSError as error:
+        if error.errno != EXDEV:
+            raise
+        with TemporaryDirectory(dir=dest.parent, prefix='.repair-') as temp:
+            staged = Path(temp) / 'verified'
+            shutil.copyfile(got, staged)
+            staged.replace(dest)
+        got.unlink()
 
 
 def install_comfy():
@@ -125,6 +160,8 @@ def main():
 
 
 if __name__ == '__main__':
+    from huggingface_hub.errors import HfHubHTTPError
+
     try:
         main()
     except (OSError, RuntimeError, HfHubHTTPError, subprocess.CalledProcessError) as error:

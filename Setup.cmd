@@ -42,6 +42,6 @@ echo Setup complete. Open Start.cmd to use Dot Sprite Workshop.
 if "%~1"=="" pause
 exit /b 0
 :fail
-echo Setup stopped. Review the error above, then run Setup.cmd again.
+echo Setup stopped. Run Diagnose.cmd to check installation or rerun Setup.cmd.
 if "%~1"=="" pause
 exit /b 1
