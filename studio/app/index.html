@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><script src="i18n-en.js"></script><script src="i18n.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Pixel Motion Studio — ドット化から、動きへ。</title><link rel="stylesheet" href="styles.css"><script src="local-api.js" defer></script><script src="app.js" defer></script><script src="candidates.js" defer></script></head>
+<body>
+<header class="top"><a class="brand" href="../" aria-label="Pixel Motion Studio について"><span class="brand-mark" aria-hidden="true">▟</span><span>Pixel Motion <b>Studio</b></span></a><span class="local">IN YOUR BROWSER <i></i></span><a href="guide.html">使い方</a><a href="../">このツールについて</a><a href="../#lab">変換の例</a></header>
+<main>
+<div class="intro"><div><p class="eyebrow">ILLUSTRATION → PIXEL → MOTION</p><h1>ドット化から、動きへ。</h1><p>1枚のイラストも、ひと続きの動きも。細部を残しながら、使える素材に。</p></div><div class="engine-note"><span class="live-dot"></span>PixelRefiner engine <strong>1.1.1</strong><small>このPCで処理 · 画像の外部送信なし</small></div></div>
+<section class="workspace" aria-label="ドット絵制作ワークスペース">
+<aside class="settings">
+<div class="section-label"><span>01</span><h2>素材を入れる</h2></div>
+<label class="dropzone" id="dropzone"><span class="upload-icon" aria-hidden="true">＋</span><strong id="dropTitle">PNGか動画を選ぶ / ドロップ</strong><span id="dropNote" aria-live="polite">連番は1〜64コマ・同じキャンバスサイズ。動画や長い連番は1周期を自動で選びます</span><span id="dropThumbs" class="drop-thumbs" hidden></span><input id="files" type="file" accept="image/png,.png,video/mp4,video/webm,.mp4,.webm,.mov,.m4v" multiple aria-label="PNG画像か動画を選択"></label>
+<div class="sample-row"><label for="sample">サンプルで試す</label><select id="sample"><option value="">サンプルを選択</option></select><button id="loadSample" class="secondary">読み込む</button></div>
+<div class="section-label settings-heading"><span>02</span><h2>仕上がりを選ぶ</h2></div>
+<label for="mode">処理方法</label><select id="mode"><option value="auto">自動で見分ける</option><option value="convert">イラストをドット化</option><option value="refine">ドットの格子を整える</option><option value="preserve">原寸を維持する</option></select><p class="hint" id="modeHint">画像の特徴から、格子復元・縮小・原寸維持を選びます。</p>
+<div class="two-fields"><div><label for="detail">縮小の細かさ</label><select id="detail"><option value="coarse">粗め</option><option value="balanced">標準</option><option value="detailed" selected>細かめ</option></select></div><div><label for="height">キャンバス高さ</label><input id="height" type="number" placeholder="自動" min="16" max="512" aria-describedby="heightHint"></div></div>
+<p class="hint" id="heightHint">空欄は自動。指定時は16〜512pxへ縮小。余白を含む高さです。「細かさ」は縮小経路で使います。</p>
+<p class="hint" id="sizeHint">画像を読み込むと、サイズを確認できます。</p>
+<label for="colors">色数 / 共通パレット</label><select id="colors"><option value="0">元の色を残す（減色なし）</option><option value="16">16色に揃える</option><option value="32">32色に揃える</option><option value="64">64色に揃える</option><option value="128">128色に揃える</option><option value="256">256色に揃える</option></select>
+<div class="two-fields bg-fields"><div><label for="background">背景</label><select id="background"><option value="auto">自動で透過</option><option value="key">グリーンバック等</option><option value="keep">維持する</option></select></div><div><label for="fps">再生速度（FPS）</label><input id="fps" type="number" min="1" max="60" value="24"></div></div><div id="keyPanel" class="key-panel" hidden><p class="key-title">透過する色（グリーン・ブルー・灰色など、下地の色を指定）</p><div class="key-row"><input id="keyColor" type="color" value="#00ff00" aria-label="透過する色"><code id="keyHex">#00FF00</code><button id="keyPick" type="button">1コマ目の四隅から取る</button></div><div class="key-presets" role="group" aria-label="よく使う色"><button type="button" data-key="#00ff00"><i style="background:#00ff00"></i>グリーン</button><button type="button" data-key="#00b140"><i style="background:#00b140"></i>放送用グリーン</button><button type="button" data-key="#0047bb"><i style="background:#0047bb"></i>ブルー</button><button type="button" data-key="#6e6e6e"><i style="background:#6e6e6e"></i>中性グレー</button></div><label for="keyTolerance">許容範囲 <output id="keyToleranceOut">80</output></label><input id="keyTolerance" type="range" min="10" max="200" step="5" value="80"><p class="hint">上げるほど、下地に近い色まで透明になります。キャラクターが欠けたら下げ、下地が残ったら上げてください。</p><label class="check"><input id="despill" type="checkbox" checked>縁の色かぶりを消す</label><p class="hint">輪郭のまわり2pxだけ、下地の色（緑なら緑み）を抜きます。内側の緑の服などはそのままです。緑の小物が輪郭にかかっていて灰色っぽくなるときは、オフにしてください。</p></div>
+<label class="check"><input type="checkbox" id="trim" checked><span>全コマ共通の余白を切り詰める</span></label>
+<label class="check"><input type="checkbox" id="hardAlpha" checked><span>透明度を0 / 255に揃える</span></label>
+<label class="check"><input type="checkbox" id="steady"><span>ちらつきを消す（1コマだけ色が入れ替わるドット）</span></label>
+<p class="hint">動画から作った連番で効きます。1コマだけのまばたきなど、わざとの変化も消えます。</p>
+<label for="loopKind">動画・長い連番から選ぶときの動き</label><select id="loopKind"><option value="auto">自動で見分ける</option><option value="walk">歩き・走り（1周期＝2歩）</option><option value="other">待機・跳ねるなど</option></select>
+<p class="hint">ドット素材向け。半透明の影・ガラスを残す場合はOFF。</p>
+<p class="hint">連番では1コマ目を基準に解像度を固定。全コマの移動範囲を残して切り抜きます。</p>
+<button class="primary" id="run" disabled>ドット化する <span aria-hidden="true">→</span></button><button id="cancel" class="secondary" hidden>処理を中止</button>
+<button id="compare" class="secondary" disabled>3つの処理方法を比較</button><p class="hint">全コマを3回処理します。縮小は指定高さ（空欄なら96px）、自動・格子整形は高さ自動。色数・背景・余白の条件は共通です。</p>
+<div class="status" role="status" aria-live="polite"><p id="status">PNGを読み込んで始めましょう。</p><progress id="progress" max="100" value="0" hidden></progress></div>
+</aside>
+<div class="editor">
+<div class="editor-toolbar"><div class="section-label"><span>03</span><h2>見比べて、動かす</h2></div><div class="view-controls"><label for="zoom">表示</label><select id="zoom"><option value="fit">フィット</option><option value="1">1倍</option><option value="2">2倍</option><option value="4">4倍</option><option value="8">8倍</option></select><label class="check"><input id="grid" type="checkbox"><span>グリッド</span></label><button id="bgToggle" class="icon-button" aria-label="プレビュー背景を暗色に切り替え" title="背景色を切り替え">◐</button></div></div>
+<div class="comparison"><div class="preview"><div class="preview-caption"><strong>入力</strong><span id="inputMeta">—</span></div><div class="stage" id="inputStage"><div class="empty" id="inputEmpty"><span class="empty-pixel" aria-hidden="true">▧</span><b>まずは、1枚から。</b><p>PNGをドロップするか<br>左のサンプルを読み込んでください。</p></div><img id="before" alt="選択した入力画像" hidden></div></div><div class="preview"><div class="preview-caption"><strong>ドット化した素材</strong><span id="outputMeta">—</span></div><div class="stage" id="outputStage"><div class="empty" id="outputEmpty"><span class="empty-pixel" aria-hidden="true">▦</span><b>残す細部を、選ぼう。</b><p>色数を絞らずにドット化できます。<br>必要なら全コマを共通色に。</p></div><div id="pixelWrap" hidden><img id="after" alt="ドット化した出力画像"><span class="pixel-grid" aria-hidden="true"></span></div></div></div></div>
+<div class="result-strip" id="resultStrip"><span>解像度も、色数も、一律には制限しません。</span><span class="muted">最近傍でくっきり表示</span></div>
+<p id="sizeResult" class="size-result" hidden></p>
+<section id="candidates" class="candidates" hidden aria-label="処理候補の比較"><h2>処理方法を見比べる</h2><p>先頭コマを同じ整数倍率・補間なしで表示。大きい画像は枠内をスクロールできます。採用後に全コマを再生して確認してください。</p><label for="candidateZoom">候補の表示倍率</label><select id="candidateZoom"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="3">3倍</option><option value="4">4倍</option></select><div id="candidateCards" class="candidate-cards"></div></section>
+<div class="transport"><div><button id="play" class="play" disabled aria-label="アニメーションを再生">▶ 再生</button><output id="frameLabel">0 / 0</output><input id="scrub" type="range" min="0" max="0" value="0" aria-label="表示コマ" disabled></div><span id="timing">24 FPS</span></div>
+<div class="frames-header"><h3>フレーム <span id="frameCount">0</span></h3><div><button id="moveLeft" class="small-button" disabled>← 前へ</button><button id="moveRight" class="small-button" disabled>後ろへ →</button><button id="remove" class="small-button" disabled>選択を外す</button></div></div>
+<div class="filmstrip" id="filmstrip" aria-label="フレーム一覧"><p>連番PNGはファイル名の数値順に並びます。読み込み後に順番を変えられます。</p></div>
+<div class="export-area"><div><p class="eyebrow">READY FOR YOUR GAME</p><h2>素材として書き出す</h2><p id="exportHint">変換後にダウンロードできます。</p></div><div id="exports" class="export-links"><span class="disabled-export">PNG</span><span class="disabled-export">シート</span><span class="disabled-export">APNG</span><span class="disabled-export">GIF</span><span class="disabled-export">一式ZIP</span></div></div>
+<div id="palette" class="palette" hidden></div>
+<details id="diagnostics" hidden><summary>変換の診断・設定を見る</summary><pre id="diagnosticText"></pre></details>
+</div>
+</section>
+<section id="guide" class="guide"><div><p class="eyebrow">ONE WORKFLOW, TWO WAYS</p><h2>AIが素材を用意。<br>ツールが動きを整える。</h2><p>この画面と<a href="../cli.html">AIエージェント用のCLI</a>は、同じ変換を使います。<br>生成サービスは自由に選び、連番PNGと設定を渡してください。</p><a href="../cli.html">CLI・MCP・スキルを見る ↗</a><a href="../#lab">変換の例を見る ↗</a></div><ol class="workflow"><li><span>1</span><div><h3>同じ条件で、コマを作る</h3><p>服装・向き・カメラ・光を固定。足元の基準線と画像サイズを揃え、キャラクターを切らずに収めます。</p></div></li><li><span>2</span><div><h3>まとめてドット化する</h3><p>全コマに同じ変換サイズを適用。必要なら共通パレットで色の揺れを抑えます。</p></div></li><li><span>3</span><div><h3>再生して、素材にする</h3><p>足の滑り・顔や衣装の変化・ループの継ぎ目を確認。PNGシートとJSONをゲームへ取り込めます。</p></div></li></ol></section>
+<section id="agent" class="agent-prompt"><div class="section-lead"><p class="eyebrow">PROMPT FOR YOUR AI</p><h2>コマを、どう作るか。</h2><p>このツールが受け取るのは、条件のそろった連番PNGです。作り方は2通りあって、<b>結果がはっきり違います</b>。実測した数字を添えて、両方の指示文を置いておきます。</p></div>
+
+<div class="route-compare"><table><thead><tr><th>そろえたい条件</th><th>動画にして歩かせる</th><th>1枚ずつ描かせる</th></tr></thead><tbody>
+<tr><th>足元の基準線</th><td class="good">ぶれ 1px</td><td class="bad">ぶれ 4〜5px</td></tr>
+<tr><th>身長のそろい</th><td class="good">比 1.039</td><td class="bad">比 1.085</td></tr>
+<tr><th>キャラクターの見た目</th><td class="good">保てる</td><td class="good">保てる</td></tr>
+<tr><th>コマ数</th><td class="good">1周期まるごと</td><td>枚数ぶんだけ</td></tr>
+<tr><th>要るもの</th><td>動画生成サービス</td><td>画像生成だけ</td></tr>
+</tbody></table><p class="route-note">同じキャラクター・同じ立ち絵から、両方の作り方で試した実測値です。115pxのドット絵で足元が4〜5pxぶれると、歩かずに<b>上下へ跳ねて</b>見えます。</p></div>
+
+<div class="route route-main"><div class="route-head"><div><p class="route-tag">おすすめ · この画面のサンプルもこの作り方</p><h3>① 動画にして歩かせる</h3><p>側面の立ち絵を1枚だけ用意して、それを動画にします。歩幅も接地も、動画のほうが勝手にそろいます。あとは1周期ぶんを切り出すだけです。</p></div><button class="copy-prompt" data-copy="videoPrompt">指示文をコピー</button></div>
+<pre id="videoPrompt">ゲーム用のスプライトを作ってください。
+
+【最初に書き換えるところ】ここだけ変えれば、下の本文にそのまま効きます
+【設定画】　&lt;ここにパス&gt;
+【動き】　　歩行
+【コマ数】　24　← 1周期を何枚にするか（軽くしたいなら12、なめらかにしたいなら32。「動画のまま全部」も可。上限64）
+【fps】　　 24
+【背景色】　#6E6E6E（中性グレー）　← グリーンバックなら #00FF00。ドット化のときは「背景」を「グリーンバック等」に
+【保存先】　&lt;ここにフォルダ&gt;
+
+本文中の【 】は、上の値のことです。
+
+【守ってほしいこと】
+1. キャラクターの見た目を文章で書き起こさないでください。【設定画】の画像そのものを
+   参照として渡してください。言葉に落とすと別人になります。
+2. 背景は【背景色】で統一してください。白やクリームだと、モデルが
+   地面の影を描き、透過したあとに足元へ白い楕円として残ります。
+3. 途中の判断は、必ず画像を見せて確認を取ってから次へ進んでください。
+4. 出力するコマは【コマ数】枚です。確認用の画像のために枚数を減らさないでください。
+
+【手順】
+① 【設定画】から側面の立ち絵を1枚用意する
+   - 設定画が三面図なら、側面だけを切り出す
+   - 検出した人物を全部並べて番号を振り、どれが側面かを私に見せて確認してから使う
+     （正面・側面・背面＋バストアップの4枚組だと、幅で選ぶと側面が落ちます）
+   - 切り出したあと、頭のてっぺんが平らに切れていないか確認する
+     （頭頂は本来1〜10pxに細ります。40px以上あれば切れています）
+   - 小道具（槍・杖・旗など）は、先端が頭より高くならないようにする
+     高いと、全体の高さで揃えたときに体だけ小さく見えます
+
+② 立ち絵を【動き】の動画にする（i2v）
+   - 被写体はキャンバスの高さの60%程度。上下左右に余白を取る
+   - プロンプトには「真横・一定の速さ・カメラは動かない・背景は平らな【背景色】・
+     影なし・床なし」を入れる
+   - 5秒（120コマ前後）あれば、歩行なら3〜4周期入ります
+
+③ 透過する
+   - 平らな下地なので、下地（【背景色】）との色の距離でアルファを作る
+   - 縁に残った下地の色を計算で取り除く（観測色 = a×被写体 + (1-a)×下地 を被写体について解く）
+   - 下地のゆらぎ（コマごとに1〜2ずれる）を切り捨てる下限を入れる。
+     入れないと画面全体が alpha 0.05 くらいで薄く残ります
+   - 確認: 抜いた絵を 白・黒・緑の3色に載せて見せてください。
+     白だけだと白いフチが見えません
+
+④ ループ区間を決める ← ここが本番
+   - まず「足がいちばん開くコマ」の間隔を測る。これが1歩。1周期＝2歩
+   - 次に画像の一致度でも周期を出す（Lコマずらした差の平均が小さいところ）
+   - この2つを突き合わせる。食い違ったら、歩数のほうを信じる
+   - 理由: 一致度の最小値は、半周期にも倍周期にも転びます。
+     半周期で切ると同じ足だけが前に出て、片足で跳ねて見えます
+   - 継ぎ目の良さは「繋ぎ目の差 ÷ 普通のコマ送りの差」で見る。1.0前後なら見分けられません
+
+⑤ 1周期を【コマ数】枚にそろえる
+   - 決めた1周期の中から、等間隔に【コマ数】枚を選ぶ（「動画のまま全部」なら間引かない）
+   - 1周期に入っている動画のコマが【コマ数】より少ないときは、補間で水増しせず、
+     実際のコマ数を私に伝えて相談してください
+   - 全コマを同じキャンバスサイズ・同じ足元の位置のまま出す（コマごとに切り詰めない）
+
+⑥ 確認して終わる
+   - 出力した【コマ数】枚を、間引かずに全部並べた一覧画像を見せてください
+   - 顔の向きは原寸で並べて見せてください。縮小した一覧では判定できません。
+     複数キャラなら全員が同じ向きか確認します
+   - 攻撃やジャンプなど1回で終わる動作は、ループにしないでください。
+     「閉じない」と出たらそれが正しい判定です
+
+【出すもの】（すべて【保存先】へ）
+- 1周期ぶん【コマ数】枚の透過PNG連番（frame-000.png から）
+- 横並びのスプライトシート（PNG）＋ コマ数・1コマの幅と高さ・【fps】 を書いたJSON
+- 動きを確認できるもの（【fps】で再生するGIFなど）</pre>
+<div class="share-x"><p><b>この手順はXでも公開しています。</b><a href="https://x.com/yonsan434343/status/2102202330041213325" target="_blank" rel="noreferrer">投稿を見る ↗</a></p><p class="share-note">この画面の指示文は、Xの投稿版から<b>書き換える所（設定画・コマ数・fps など）を冒頭にまとめた改訂版</b>です。コマ数を変えれば、出てくる枚数も変わります。</p><p class="share-ask">役に立ったら、いいね・リポスト・引用リポストをしてもらえると励みになります。うまくいかなかったところを引用で教えてもらえるのも、同じくらい助かります。</p></div>
+<p class="route-foot"><b>④が本番です。</b>ここを外すと、半周期で切れて<b>片足だけで跳ねる</b>アニメになります。実際に一度やりました（51コマ＝2周期で切れていた）。足の開きから歩数を数えて突き合わせると見つかります。</p>
+</div>
+
+<details class="route route-alt"><summary>② 1枚ずつ描かせる（動画が使えないとき）</summary><div class="route-head"><div><p>参照画像を渡せば、髪飾りの宝石やコートの模様まで保てます。ただし<b>足元と大きさがずれます</b>。少ないコマ数で、あとから位置を合わせる前提なら使えます。</p></div><button class="copy-prompt" data-copy="stillPrompt">指示文をコピー</button></div>
+<pre id="stillPrompt">キャラクターの歩行アニメーション用に、連番のPNGを作ってください。
+設定画は &lt;ここにパス&gt; にあります。見た目は文章にせず、画像を参照として渡してください。
+
+■ 出力するもの
+・1枚に1コマ。4〜8枚。全部おなじキャンバスサイズ（例: 1024 × 1536）
+・ファイル名は frame-000.png から連番
+・背景は中性グレー（#6E6E6E）の平らな一色。透過にしない
+・1枚の中に複数のコマを並べない。番号・枠・説明文を入れない
+
+■ 全コマで固定するもの
+・髪、瞳、衣装、装飾、頭身、左右の向き
+・カメラの位置、視線の方向、被写体の大きさ、光の向き
+・足元の基準線（地面の高さ）と、体の基準点
+
+■ 動きのつけ方
+・「接地 → 沈み → 通過 → 上昇」を、左右の足で一巡させる
+・最後のコマに1コマ目と同じ絵を置かない（ループで重なるため）
+
+■ 気をつけること
+・頭のてっぺんと足先が切れないよう、余白を残す
+・床の影、発光、半透明のふちは入れない
+・途中で顔や服が変わったコマ、欠けた手足は、そのコマを描き直す
+
+■ 出したあとに必ずやること
+・全コマの「足元のY座標」と「頭頂から足先までの高さ」を測って並べてください
+・足元が8px以上ずれているコマ、高さが5%以上違うコマを教えてください
+  （そのままでは歩行になりません。位置合わせか描き直しが要ります）</pre>
+<p class="route-foot">上の指示文で4コマ作って測った結果が、比較表の右の列です。<b>「全コマで足元をそろえて」と書いても、そろいません。</b>だから最後に測る工程を足してあります。</p>
+</details>
+
+<div class="agent-notes"><h3>使うエージェントによって、必要なものが違います</h3><ul><li><b>Codex / ChatGPT</b> — 画像生成は組み込まれています。②はそのまま渡せます。<b>①の動画生成は入っていないので、動画のサービスを別に用意してください。</b></li><li><b>Claude Code</b> — それ自体には画像も動画も作る機能がありません。<b>Codexを呼び出せるようにするか、画像生成サービスへの接続（OpenRouterなどの連携）を先に用意してください。</b>そのうえで指示文を渡します。</li></ul><p class="agent-foot">①で使える動画生成は、画像から動画を作れるもの（image-to-video）なら何でもかまいません。ローカルで動かす構成でも同じ手順です。ポーズを固定して1枚ずつ描く方法（ControlNetなど）もありますが、こちらは試していません。</p></div>
+</section>
+<section class="notes"><details><summary>Pixel Refinerと、どこが同じ？</summary><p>公開されているMIT版PixelRefinerの画像処理エンジンを使用しています。単画像では上流の自動分類・格子推定・エッジを考慮した縮小を利用。連番では当ツールが1コマ目の解像度を固定し、共通の切り抜きと減色を追加します。公式サイトの全設定・全候補UIの再現ではなく、設定・バージョンによって仕上がりは異なります。</p><p>細かい装飾を保護するため、小さな孤立領域の自動除去はこの版では無効です。透かしの除去も行いません。</p><a href="https://github.com/HappyOnigiri/PixelRefiner" target="_blank" rel="noreferrer">使用しているエンジンのソース ↗</a></details><details><summary>PNG・APNG・GIFの違いと、できることの限界</summary><p>PNGとAPNGはフルカラーを保存できます。GIFは最大256色（透明色を含む）と10ms単位の時間制約があるため、色と速度が変わる場合があります。ゲーム素材はPNGシート、見た目の確認はAPNGが適しています。</p><p>このツールは、1枚から新しいポーズを生成するものではありません。顔・衣装・手足の整合性や足の接地は入力の品質に依存します。自動背景透過は背景と服の色が近い場合に欠けることがあります。出力を見て、背景の維持や元画像の修正を選んでください。</p><p>変換はこのページの中だけで行われます。画像がサーバーへ送られることはありません。結果はブラウザに一時保存され、直近5件まで再表示できます。閲覧データを消すと一緒に消えるので、必要なものは書き出して保存してください。</p></details></section>
+</main><footer><span>Pixel Motion Studio</span><span>Powered by <a href="https://github.com/HappyOnigiri/PixelRefiner" target="_blank" rel="noreferrer">PixelRefiner</a> · © 2026 Happy Onigiri · <a href="../LICENSES.txt" target="_blank">Licenses</a></span></footer>
+</body></html>

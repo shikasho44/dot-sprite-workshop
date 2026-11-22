@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ドット絵工房</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+  <script src="/motion.js" defer></script>
+  <script src="/handoff.js" defer></script>
+  <script src="/workshop-link.js" defer></script>
+</head>
+<body>
+      <a class="skip" href="#workbench">入力フォームへ</a>
+  <main class="desk">
+    <header class="masthead">
+      <div><h1>ドット絵工房</h1><p>文章から、ゲームに使える小さなドット絵を。</p></div>
+      <div class="masthead-actions">
+        <button class="motion-open" id="motion-open" type="button">手元のPNGを動かす</button>
+        <a href="/studio/app/">Pixel Motion Studioを開く</a>
+      </div>
+    </header>
+    <div class="workspace">
+      <form id="generator" autocomplete="off">
+        <fieldset id="workbench" class="source-mode" tabindex="-1">
+          <legend>作り方</legend>
+          <label class="mode"><input name="mode" type="radio" value="text" checked>文章から作る</label>
+          <label class="mode"><input name="mode" type="radio" value="reference">画像から作る</label>
+        </fieldset>
+        <fieldset id="text-models">
+          <legend>モデル</legend>
+          <label class="model"><input name="model" type="radio" value="pixelart-50m" checked><span>pixelart-50m<small>32 × 32 px</small></span></label>
+          <label class="model"><input name="model" type="radio" value="ubanova-16"><span>UbaNova-16<small>16 × 16 px</small></span></label>
+          <label class="model compare-option"><input name="model" type="radio" value="compare"><span>2モデルを比較<small>4案ずつ · 計8案</small></span></label>
+        </fieldset>
+        <div id="reference-fields" hidden>
+          <label class="prompt-label" for="reference-image">元画像</label>
+          <input type="file" id="reference-image" name="reference" accept="image/png,image/jpeg,image/webp" aria-describedby="reference-hint">
+          <p class="hint" id="reference-hint">透過PNGか、周囲が単色の画像が適しています。PNG・JPEG・WebP、10 MBまで。</p>
+          <p class="hint" id="reference-setup" hidden>AIで描き直すには、対応するNVIDIA GPUで Setup-Image-Editing.cmd を実行してください。</p>
+          <p id="reference-error" class="field-error" aria-live="polite"></p>
+        </div>
+        <label class="prompt-label" for="prompt">描きたいもの</label>
+        <textarea name="prompt" id="prompt" maxlength="200" rows="3" required placeholder="例　金色の鍵"></textarea>
+        <div class="examples" id="text-examples" aria-label="入力例">
+          <button type="button" data-prompt="silver longsword with a gold crossguard">剣</button>
+          <button type="button" data-prompt="round red health potion bottle with a cork stopper">薬瓶</button>
+          <button type="button" data-prompt="closed oak treasure chest with gold bands and a brass lock">宝箱</button>
+        </div>
+        <p class="hint" id="prompt-hint">日本語または英語で入力。日本語は自動で英訳します。</p>
+        <button id="submit" class="primary" type="submit">4案を生成</button>
+      </form>
+      <section class="results" aria-labelledby="results-title">
+        <div class="result-head"><h2 id="results-title">候補</h2><p id="status" role="status" aria-live="polite">見本 · pixelart-50m</p></div>
+        <p id="translation" class="translation" hidden>画像生成に使った英訳 <span lang="en"></span></p>
+        <p id="studio-handoff-status" role="status"></p>
+        <div id="results" class="tiles" aria-busy="false"></div>
+      </section>
+    </div>
+  </main>
+  <template id="tile">
+    <figure class="tile">
+      <div class="preview"><img width="120" height="120" alt=""></div>
+      <figcaption><span></span><div class="tile-actions"><a>PNG保存</a><button type="button" data-motion>一部を動かす</button><button type="button" data-to-studio>Studioへ送る</button></div></figcaption>
+    </figure>
+  </template>
+  <dialog id="motion-dialog" aria-labelledby="motion-title">
+    <div class="motion-head">
+      <h2 id="motion-title">一部を動かす</h2>
+      <button id="motion-close" type="button">閉じる</button>
+    </div>
+    <label for="motion-input">元のPNG（縦横64pxまで）</label>
+    <input id="motion-input" type="file" accept=".png,image/png">
+    <fieldset id="motion-controls" disabled>
+      <div class="motion-options">
+        <label for="motion-effect">動き
+          <select id="motion-effect">
+            <option value="ripple">揺らぎ</option><option value="fire">炎</option><option value="wind">風</option>
+          </select>
+        </label>
+        <label><input id="motion-erase" type="checkbox">消しゴム</label>
+        <button id="motion-auto" type="button">範囲の候補</button>
+        <button id="motion-clear" type="button">選択を消す</button>
+      </div>
+      <p id="motion-help" class="hint">動かす絵と、その周りの動ける余白を塗ります。キーボードは矢印で移動、スペースで塗る・消す。</p>
+      <div class="motion-images">
+        <div><p>動かす範囲</p><div class="motion-board"><canvas id="motion-mask" tabindex="0" aria-label="動かす範囲のピクセル選択" aria-describedby="motion-help"></canvas></div></div>
+        <div><p>プレビュー</p><div class="motion-preview"><img id="motion-preview" width="256" height="256" alt="指定した範囲のモーション" hidden></div></div>
+      </div>
+      <div class="motion-actions">
+        <button id="motion-play" type="button">プレビューを作る</button>
+        <button id="motion-toggle" type="button" hidden>停止</button>
+        <button id="motion-export" type="button" disabled>Pixel Motion Studioで書き出す</button>
+        <button id="motion-send" type="button" disabled>連番をStudioで開く</button>
+      </div>
+    </fieldset>
+    <p id="motion-status" class="hint" role="status"></p>
+  </dialog>
+</body>
+</html>

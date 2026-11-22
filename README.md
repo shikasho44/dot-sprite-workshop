@@ -1,0 +1,44 @@
+# ドット絵工房
+
+日本語や英語からドット絵を作り、透過PNGで保存するWindows向けローカルアプリです。Pixel Motion Studioと素材を往復できます。
+
+## 最初の1回だけ
+
+1. [GitHubのReleases](https://github.com/shikasho44/dot-sprite-workshop/releases/latest)から、Assets欄の `Dot-Sprite-Workshop-Windows-v0.1.0.zip` を保存し、右クリックから「すべて展開」します。
+2. [Python 3.12.10のWindows installer (64-bit)](https://www.python.org/downloads/release/python-31210/#files) をインストールします。インストール画面で `py launcher` を有効にしてください。すでに64ビットのPython 3.12と `py` があればこの手順を省けます。
+3. 展開したフォルダの **Setup.cmd** をダブルクリックします。まず **C** を選ぶとCPUで動きます。CUDA 13に対応するNVIDIA GPUとドライバーがある場合は **N** を選ぶと高速化できます。
+4. `Setup complete` が出たら、同じフォルダの **Start.cmd** をダブルクリックします。ブラウザで開かなければ [ドット絵工房](http://127.0.0.1:8765/) を開きます。
+
+Windows 10/11のx64を対象にしています。セットアップ時はインターネット接続が必要です。基本モデルは約1.2 GBで、これにPythonライブラリとPyTorchが加わります。Python環境は、Windowsのパス長制限にかかりにくいよう `%LOCALAPPDATA%\DotSpriteWorkshop\venv-v1` に入ります。モデルは展開したアプリの `data` に入ります。作業用の空きを含め、CPU版は5 GB以上、NVIDIA版は10 GB以上を目安にしてください。セットアップ後の翻訳・生成とアプリ間の素材の受け渡しはPC内で動きます。終了するときは起動ウィンドウで Ctrl+C を押します。
+
+## ドット絵を作って動かす
+
+- **文章から作る**　「金色の鍵」などを入力すると4案出ます。pixelart-50mは32×32、UbaNova-16は16×16です。「2モデルを比較」で同じ英訳から各4案を出せます。
+- **画像から作る**　透過PNGや周囲が単色の画像を選び、「変換見本を作る」で元の形と色を残した32×32の透過PNGにします。
+- **一部を動かす**　候補や縦横64px以下の手元のPNGから、動かす範囲を塗り、「揺らぎ・炎・風」でプレビューします。
+- **Studioへ送る**　候補のボタンからPNGを渡せます。「連番をStudioで開く」では、コマとFPSも渡します。
+- **工房へ戻す**　同梱のStudioでコマを選んで「選択中のコマをドット絵工房へ」を押すと、工房の画像入力に読み込まれます。GIF・PNGシート・ZIPはStudioから書き出せます。
+
+両アプリの往復には、工房から開いた同梱版のPixel Motion Studioを使います。Node.jsが入っているPCでは、工房のプレビューからもStudio CLIで直接ZIPを書き出せます。
+
+## 画像をAIで描き直す場合
+
+NVIDIA版を入れたPCで **Setup-Image-Editing.cmd** を実行して再起動します。推論ライブラリとFLUX.2 Klein 4B関連の重みを取得します。重みだけで約8.3 GBあり、追加で15 GB以上の空きを目安にしてください。RTX 5080 16 GBでの動作を確認しています。別のGPUや少ないVRAMでの動作は構成に依存します。導入後は「画像から作る」で「金色に」などを指定し、変換見本1枚とAI編集4案を得られます。
+
+## 困ったとき
+
+| 状況 | 確認すること |
+| --- | --- |
+| Pythonが見つからない | 64ビットのPython 3.12を入れ、別の端末で `py -3.12 -V` が通るか確認します。 |
+| モデル取得が途中で止まった | 起動ウィンドウに出た取得先・エラーを確認し、Setup.cmdをもう一度実行します。取得済みの重みは照合して再利用します。 |
+| NVIDIAを選んだがCUDAが使えない | GPUとドライバーのCUDA対応を確認するか、Setup.cmdを C でやり直します。 |
+| PyTorchのDLLを読み込めない | [Microsoft Visual C++ 再頒布可能パッケージ (x64)](https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist) を確認します。 |
+| 初回の生成が遅い | 初回はモデルを読み込みます。CPUではGPUより時間がかかります。軽い16×16のUbaNova-16から試せます。 |
+| 画像の描き直しを選べない | 基本セットアップでは変換見本を作れます。AIでの描き直しはNVIDIA対応の追加セットアップを完了してから再起動します。 |
+| 別のPCに移したい | 移動先で再セットアップします。取得済みモデルは `data` をコピーできます。Python環境は移動先で作り直します。 |
+
+## MCPと利用条件
+
+MCPは任意です。MCPクライアントから `%LOCALAPPDATA%\DotSpriteWorkshop\venv-v1\Scripts\python.exe` で `mcp_server.py` を実行するstdioサーバーとして登録します。先に同じPythonで `python -m pip install -r requirements-mcp.txt` を行い、工房を起動します。`generate_sprites` と `edit_sprite` がPNGを返します。後者は画像編集の追加セットアップが必要です。
+
+各モデルと同梱ソフトウェアの出典は [NOTICE.md](NOTICE.md) を参照してください。

@@ -1,0 +1,7 @@
+/server.log
+/server-error.log
+/__pycache__/
+/data/
+/.venv/
+/Local-Settings.cmd
+*.log

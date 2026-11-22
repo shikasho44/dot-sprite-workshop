@@ -1,0 +1,230 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><script src="i18n-en.js"></script><script src="i18n.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">
+<title>使い方 | Pixel Motion Studio</title>
+<meta name="description" content="Pixel Motion Studio の使い方。画像の入れ方、仕上がりの選び方、書き出し、1ドット修正、うまくいかないときの確かめ方。">
+<link rel="stylesheet" href="styles.css">
+<style>
+.guide-page{max-width:980px;margin:auto;padding:0 28px 60px}
+.guide-head{padding:30px 0 18px}
+.guide-head h1{font-size:30px;margin:6px 0 10px}
+.guide-head p{font-size:13px;line-height:1.9;max-width:720px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:12px;font-weight:700;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.guide-page section{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:24px 26px;margin-top:18px;scroll-margin-top:16px}
+.guide-page h2{font-size:19px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.guide-page h2 .num{font:700 12px var(--mono);color:var(--teal);background:var(--teal-light);border-radius:4px;padding:3px 7px}
+.guide-page h3{font-size:14px;margin:20px 0 8px}
+.guide-page p,.guide-page li{font-size:13px;line-height:1.95}
+.guide-page p{margin:0 0 10px}
+.guide-page ul,.guide-page ol{margin:0 0 10px;padding-left:22px}
+.guide-page li{margin-bottom:4px}
+.guide-page table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 12px}
+.guide-page th,.guide-page td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:9px 8px;line-height:1.8}
+.guide-page th{color:var(--strong);white-space:nowrap}
+.guide-page thead th{background:var(--teal-light)}
+.guide-page kbd{font:11px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:1px 6px;background:var(--base);white-space:nowrap}
+.steps3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:4px 0 6px;padding:0;list-style:none}
+.steps3 li{background:var(--base);border-radius:7px;padding:14px 16px;margin:0}
+.steps3 b{display:block;color:var(--strong);font-size:14px;margin-bottom:4px}
+.tip{background:var(--teal-light);border-radius:7px;padding:12px 16px;margin:12px 0}
+.tip p:last-child{margin:0}
+.warn{border-left:4px solid var(--warm);background:#fff8ec;padding:10px 14px;border-radius:0 7px 7px 0;margin:12px 0}
+.guide-page .toc,.guide-page .steps3{padding-left:0}
+.back-links{display:flex;gap:16px;flex-wrap:wrap;margin-top:26px;font-size:13px;font-weight:700}
+@media(max-width:700px){.guide-page{padding:0 14px 40px}.guide-page section{padding:18px 16px}.steps3{grid-template-columns:minmax(0,1fr)}.guide-head h1{font-size:25px}.guide-page table{font-size:11px}.guide-page th{white-space:normal}}
+</style></head><body>
+<header class="top"><a class="brand" href="../" aria-label="Pixel Motion Studio について"><span class="brand-mark" aria-hidden="true">▟</span><span>Pixel Motion <b>Studio</b></span></a><a href="index.html">制作画面</a><a href="pixel-editor.html">1ドット修正</a><a href="../">このツールについて</a></header>
+<main class="guide-page">
+
+<div class="guide-head"><p class="eyebrow">HOW TO USE</p><h1>使い方</h1><p>画像を入れて、仕上がりを選んで、書き出す。基本はこの3つです。ここでは、それぞれの設定が何をするかと、直すための画面の使い方、うまくいかないときの確かめ方をまとめています。</p>
+<ul class="toc"><li><a href="#start">はじめに</a></li><li><a href="#input">画像を入れる</a></li><li><a href="#settings">仕上がりを選ぶ</a></li><li><a href="#check">見比べる・動かす</a></li><li><a href="#export">書き出す</a></li><li><a href="#editor">1ドット修正</a></li><li><a href="#keys">キー操作</a></li><li><a href="#trouble">うまくいかないとき</a></li><li><a href="#data">画像の扱い</a></li></ul></div>
+
+<section id="start"><h2><span class="num">00</span>はじめに</h2>
+<ol class="steps3"><li><b>① 入れる</b>PNGを選ぶか、画面にドロップします。</li><li><b>② 選ぶ</b>処理方法・大きさ・色数を決めて「ドット化する」。</li><li><b>③ 書き出す</b>PNG・シート・APNG・GIF・ZIPから選んで保存。</li></ol>
+<div class="tip"><p>手元に画像がなくても、「サンプルで試す」から<b>5体の見本</b>（ペンギンの歩き、剣士の走り、魔法使いの待機、跳ねるスライム、ネコの歩き）を読み込めます。まずこれで一通り触ってみるのがおすすめです。</p></div>
+</section>
+
+<section id="input"><h2><span class="num">01</span>画像を入れる</h2>
+<ul>
+<li><b>PNG か動画</b>（mp4・webm）を受け付けます。JPEGなどは、PNGで保存し直してから入れてください。</li>
+<li>1回に<b>1〜64コマ</b>。連番のときは、<b>全コマ同じキャンバスサイズ</b>にしてください。</li>
+<li><b>動画</b>や<b>64コマを超える連番</b>を入れると、つなぎ目の目立たない<b>1周期を自動で選んでから</b>読み込みます。歩き・走りは歩数で確かめます。動きの種類は「動画・長い連番から選ぶときの動き」で選べます。</li>
+<li>大きさの上限は<b>1辺4096px・1枚419万画素</b>までです。</li>
+<li>複数選ぶと、<b>ファイル名の数字の順</b>に並びます（frame-2 → frame-10 の順）。並びは後から「← 前へ」「後ろへ →」で変えられます。</li>
+<li>画面の<b>どこにドロップしても</b>入ります。</li>
+</ul>
+<h3>入ったかどうかは、入れる枠で分かります</h3>
+<table><tbody>
+<tr><th>緑の枠「✓ ○コマ入っています」</th><td>入っています。寸法と、先頭から10コマの小さな見本が出ます。</td></tr>
+<tr><th>赤の枠</th><td>入りませんでした。理由が枠の中に出ます。前に入っていたコマはそのまま残ります。</td></tr>
+<tr><th>回る印「読み込んでいます…」</th><td>読み込み中です。終わるまで次の画像は受け付けません。</td></tr>
+</tbody></table>
+<h3>足すか、入れ替えるか</h3>
+<ul>
+<li>変換する前で、<b>同じ大きさ</b>の画像なら、今あるコマの後ろに<b>足します</b>。</li>
+<li><b>大きさが違う</b>画像や、<b>変換したあと</b>に入れた画像は、前のコマと<b>入れ替えます</b>。</li>
+</ul>
+</section>
+
+<section id="settings"><h2><span class="num">02</span>仕上がりを選ぶ</h2>
+<h3>処理方法</h3>
+<table><thead><tr><th>選択肢</th><th>向いている画像</th></tr></thead><tbody>
+<tr><th>自動で見分ける</th><td>画像の特徴から、下の3つのどれかを選びます。</td></tr>
+<tr><th>イラストをドット化</th><td>普通のイラスト（AIで作った絵など）。輪郭を見ながら、小さなキャンバスへ縮めます。</td></tr>
+<tr><th>ドットの格子を整える</th><td>すでにドット絵っぽい画像。拡大されたドットの格子を見つけて、境目を整えます。</td></tr>
+<tr><th>原寸を維持する</th><td>大きさは変えずに、背景の透過や色数だけ整えたいとき。</td></tr>
+</tbody></table>
+<div class="tip"><p><b>迷ったら「3つの処理方法を比較」</b>を押してください。自動・イラストをドット化・格子を整えるの3通りを並べて見せるので、良かったものを「採用」できます。</p><p>滑らかなイラストでは、自動が「格子を整える」を選んで輪郭が荒れることがありました。<b>「イラストをドット化」・キャンバス高さ96・64色</b>から始めると比べやすいです。</p></div>
+<h3>そのほかの設定</h3>
+<table><tbody>
+<tr><th>縮小の細かさ</th><td>粗め / 標準 / 細かめ。「イラストをドット化」で縮めるときの細かさです。</td></tr>
+<tr><th>キャンバス高さ</th><td>空欄なら自動。数字（16〜512）を入れると、その高さまで縮めます。<b>余白を含んだ高さ</b>なので、完成した絵はこれより小さくなります。</td></tr>
+<tr><th>色数 / 共通パレット</th><td>減色なし、または16〜256色。連番では<b>全コマで同じ色の組</b>を使うので、コマごとに色が揺れません。</td></tr>
+<tr><th>背景</th><td><b>自動で透過</b> … 背景らしい色を推定して抜きます。<br><b>グリーンバック等</b> … 抜く色を自分で決めます。動画生成などで<b>緑・青・灰色の単色の下地</b>にしたコマはこちらが確実です。<br><b>維持する</b> … 背景を残します。服と背景の色が近くて欠けるときにも。</td></tr>
+<tr><th>全コマ共通の余白を切り詰める</th><td>全コマを囲む枠で切るので、コマごとの位置関係は変わりません。</td></tr>
+<tr><th>透明度を0 / 255に揃える</th><td>半透明のふちを、透明か不透明かのどちらかに揃えます。透ける布やガラスを残したいときは外してください。</td></tr>
+<tr><th>再生速度（FPS）</th><td>1〜60。確認の再生と、APNG・GIFの速さに使います。</td></tr>
+<tr><th>ちらつきを消す</th><td>1コマだけ色が入れ替わるドットを、前後のコマと同じ色にそろえます。動画から作った連番で効きます。1コマだけのまばたきなど、わざとの変化も消えるので、再生して確かめてください。</td></tr>
+<tr><th>動画・長い連番から選ぶときの動き</th><td>自動 / 歩き・走り / 待機・跳ねるなど。歩き・走りは1周期＝2歩で選びます。選んだ周期が半分（片足だけ前に出る）や長すぎるときに指定します。</td></tr>
+</tbody></table>
+</section>
+
+<section id="check"><h2><span class="num">03</span>見比べる・動かす</h2>
+<ul>
+<li>左が入れた画像、右がドット化した結果です。<b>表示</b>で倍率（フィット / 1・2・4・8倍）、<b>グリッド</b>でドットの区切り、<b>◐</b>で背景の明暗を切り替えます。</li>
+<li><b>▶ 再生</b>で動きを確かめます。つまみを動かすと、1コマずつ送れます。</li>
+<li>下の一覧でコマを選び、「← 前へ」「後ろへ →」で順番を入れ替え、「選択を外す」で抜けます。</li>
+<li>足が滑る、顔や服が途中で変わる、ループのつなぎ目でがくっとする、はここで見つけます。</li>
+</ul>
+</section>
+
+<section id="export"><h2><span class="num">04</span>書き出す</h2>
+<table><thead><tr><th>形式</th><th>使いどころ</th></tr></thead><tbody>
+<tr><th>PNG</th><td>いま表示しているコマ1枚。</td></tr>
+<tr><th>シート</th><td>全コマを横に並べた1枚。ゲームに取り込むならこれ。</td></tr>
+<tr><th>座標JSON</th><td>シートの各コマの位置（spritesheet.json）。Phaser・PixiJS がそのまま読める形式です。</td></tr>
+<tr><th>APNG</th><td>フルカラーのまま動く画像。見た目の確認や共有に。</td></tr>
+<tr><th>GIF</th><td>多くの場所で動く形式。ただし最大255色＋透明になり、時間も1/100秒単位に丸まります。</td></tr>
+<tr><th>Godot</th><td>Godot 4 の SpriteFrames（spriteframes.tres）。一式ZIPには、足元が原点のシーン（sprite.tscn）と、Phaser の load.aseprite で読める spritesheet-aseprite.json も入ります。</td></tr>
+<tr><th>一式ZIP</th><td>全コマのPNG・シート・座標JSON・Godot と Aseprite 形式のファイル・APNG・GIF・設定のJSON・ライセンスをまとめたもの。</td></tr>
+</tbody></table>
+<p>設定のJSON（manifest.json）には、コマ数・1コマの幅と高さ・シートの並び・使った設定が入っています。</p>
+<p>あわせて、全コマ共通の<b>足元の基準点</b>（<code>geometry.pivot</code>）と、<b>足元のずれ</b>・<b>孤立した1ドットの数</b>（<code>quality</code>）も入ります。足元のずれは、変換結果の上の帯にも出ます。歩き・待機で3px以上ずれていたら、一番高いコマを見直してください。</p>
+<p>同じ変換をコマンドや AIエージェントから動かすときは、<a href="../cli.html">CLI・MCP・スキル</a>を使います。今回足した機能の使い方と結果は<a href="../features.html">機能の説明</a>にあります。</p>
+</section>
+
+<section id="editor"><h2><span class="num">05</span>1ドット修正</h2>
+<p>変換した結果の、気になる1ドットだけを直す画面です。制作画面で変換したあと、書き出しの右にある<b>「1ドット修正 ↗」</b>から開きます。変換結果がないまま開いた場合は、その場でペンギンの見本を変換して開くこともできます。</p>
+<p><b>元の結果は上書きしません。</b>「修正版を保存」を押すと、直したものが別の結果として作られます。</p>
+<h3>左クリックと右クリック</h3>
+<ul>
+<li>「左クリック」「右クリック」それぞれに、<b>道具（ペン / 消しゴム / スポイト）・色・不透明度</b>を持たせられます。はじめは左がペン、右が消しゴムです。</li>
+<li><kbd>Alt</kbd>＋クリックで、押した側の色を画面から取ります。</li>
+<li>片方をスポイトにすると、取った色は<b>ペンになっているもう片方</b>に入ります。「右で色を拾って、左で塗る」ができます。</li>
+<li><kbd>X</kbd> で左右を丸ごと入れ替えます。</li>
+</ul>
+<h3>形を崩さずに直す</h3>
+<ul>
+<li><b>塗りつぶし</b>（道具の選択肢）… 押した画素とぴったり同じ色で、上下左右につながっている範囲を塗ります。</li>
+<li><b>透明部分を保護（色だけ塗る）</b>（<kbd>L</kbd>）… 透明なところには描かず、描いたところの不透明度も変えません。輪郭を崩さずに色だけ直せます。消しゴムは効かなくなります。</li>
+<li><b>複数コマを同時に直す</b>（<kbd>M</kbd>）… 開始コマ〜終了コマを決めると、ペン・消しゴム・塗りつぶしが、そのコマ全部の<b>同じ位置</b>にも入ります。キャラクターが動かない部分（固定の小物など）を一度に直すときに。<kbd>Ctrl</kbd>＋<kbd>Z</kbd> で全コマまとめて戻ります。</li>
+<li><b>画面だけ左右反転</b>（<kbd>H</kbd>）… 見え方だけを反転します。PNGの絵は変わりません。反転したまま描いても、正しい位置に描かれます。左右の崩れを見つけるのに使います。</li>
+</ul>
+<h3>範囲を選んで動かす</h3>
+<ol>
+<li>左か右の道具を<b>範囲選択</b>にして、キャンバスをドラッグします。</li>
+<li><b>矢印キー</b>（<kbd>Shift</kbd>で5px）か、キャンバスの上の ← ↑ ↓ → で、選んだ部分を<b>1pxずつ</b>動かします。選んだ範囲の中をドラッグしても動きます。</li>
+<li><kbd>Enter</kbd>（確定）で決定、<kbd>Esc</kbd>（取り消し）で元の位置に戻ります。<kbd>Del</kbd> で選んだ範囲の中身を消します。</li>
+</ol>
+<p>「複数コマを同時に直す」と組み合わせると、<b>範囲の全コマで同じ部分を同じだけ</b>動かせます（例: 全コマの帽子を1px上へ）。確定した移動は <kbd>Ctrl</kbd>＋<kbd>Z</kbd> で1回で戻ります。</p>
+<h3>パレット</h3>
+<table><tbody>
+<tr><th>共通パレット</th><td>変換で色数を減らしたときの色。減色しなかったときは選べません。</td></tr>
+<tr><th>このコマの色</th><td>いま開いているコマで使われている色を、多い順に最大64色。</td></tr>
+<tr><th>マイパレット</th><td>自分で作る色の組。このブラウザに保存されます。</td></tr>
+</tbody></table>
+<ul>
+<li>色見本を<b>左クリックで左の色</b>、<b>右クリックで右の色</b>にします。いま左右に入っている色には枠が付きます。</li>
+<li>マイパレットは「左の色を追加」「左の色を外す」で作れます。</li>
+<li>「ファイルから読む」で <b>.hex / .gpl / .pal / .txt</b> を読めます。<a href="https://lospec.com/palette-list" target="_blank" rel="noreferrer">Lospec</a> で配っているパレットはそのまま使えます。色コードを貼り付けて読むこともできます。</li>
+<li>「書き出す」で、いま表示しているパレットを .hex で保存します。</li>
+</ul>
+<h3>そのほかの道具</h3>
+<p>「表示するツールを選ぶ」から開きます。上の「作業セット」で、よく使う組み合わせをまとめて開けます。</p>
+<table><tbody>
+<tr><th>座標入力</th><td>X・Yを指定して1ドットに適用します。矢印キーで座標を動かし、<kbd>Space</kbd>で適用。</td></tr>
+<tr><th>アニメ確認</th><td>前後のコマを赤・青で重ねる（前・後それぞれ0〜3枚。離れるほど薄く）、<b>いつも重ねるコマ</b>を緑で固定する、最初と最後のコマをつなげて比べる、足元・中心線を出す、確認用に再生する。<b>再生したまま描けます</b>。どれも表示だけで、PNGには入りません。</td></tr>
+<tr><th>一括色変更</th><td>指定したコマの範囲で、ぴったり同じ色を別の色に置き換えます。変えたくない長方形を指定できます。適用前に、どのコマの何ドットが変わるかを見て選べます。</td></tr>
+<tr><th>修正の転送候補</th><td>いまのコマで直前に直した内容を、ずらし量を指定して他のコマへ配る候補を出します。直す前の色がぴったり同じコマだけが候補になります。</td></tr>
+<tr><th>参照画像</th><td>このコマの<b>元のイラスト</b>（ドット化する前の画像）を、ドットの位置に合わせて<b>横に並べる</b>か<b>重ねる</b>。重ねる濃さも変えられます。修正版を保存したあとも、最初の変換結果の元画像をたどって出します（ブラウザ版は直近5件の結果まで）。</td></tr>
+<tr><th>色のチェック</th><td>AIの変換で混じった<b>にじみの中間色</b>を探して、黄色い枠で囲みます。探すのは「使われている数が少ない色（何画素以下か指定）」「<b>似た色</b>（差がいくつ以内なら、よく使われている方にまとめるか指定）」「パレットにない色（共通パレットかマイパレットが基準。パレットのうち<b>使われていない色</b>も一覧にし、マイパレットなら外せます）」。見つかったコマへ一覧から移れて、<b>近い色に置き換える候補</b>も出せます。置き換えは「適用前の確認」でコマごとに選びます。</td></tr>
+</tbody></table>
+<h3>元に戻す・保存</h3>
+<ul>
+<li><kbd>Ctrl</kbd>＋<kbd>Z</kbd> で元に戻す、<kbd>Ctrl</kbd>＋<kbd>Shift</kbd>＋<kbd>Z</kbd> でやり直す。コマごとに直近50操作まで。</li>
+<li>編集中の内容は、このブラウザに<b>自動で保存</b>されます。「自動保存済み」を確かめてから閉じてください。</li>
+</ul>
+<h3>パソコンに保存する</h3>
+<p>左の列のいちばん下、<b>「保存」</b>の枠で、押す前に2つ選んでおきます。選んだ内容は次から覚えています。</p>
+<table><tbody>
+<tr><th>パソコンの保存先</th><td><b>ダウンロードフォルダ（ZIP）</b>… 「pixel-motion_修正版_日時.zip」がダウンロードフォルダに入ります。<br><b>フォルダを選ぶ</b>… 選んだフォルダの中に「pixel-motion_修正版_日時」フォルダを作って、ファイルを直接入れます。Chrome・Edge だけで使えます。ブラウザを開き直したあとの1回目は、書き込みの許可を聞かれます。<br><b>保存しない</b>… ブラウザの中にだけ残します。</td></tr>
+<tr><th>保存したあと</th><td><b>この画面で続ける</b> か、<b>制作画面へ移動して確認</b> するか。制作画面では、直したものを再生して確かめたり、書き出し直したりできます。</td></tr>
+</tbody></table>
+<p>「修正版を保存」を押すと、<b>どこに、何という名前で保存したか</b>が画面に出ます。中身は全コマのPNG・スプライトシート・アニメーション（GIF / APNG）・設定のJSONです。</p>
+</section>
+
+<section id="keys"><h2><span class="num">06</span>キー操作</h2>
+<table><thead><tr><th>キー</th><th>できること</th><th>画面</th></tr></thead><tbody>
+<tr><th>左クリック / 右クリック</th><td>それぞれに割り当てた道具で描く</td><td>1ドット修正</td></tr>
+<tr><th><kbd>Alt</kbd>＋クリック</th><td>押した側の色を画面から取る</td><td>1ドット修正</td></tr>
+<tr><th><kbd>X</kbd></th><td>左右の道具と色を入れ替える</td><td>1ドット修正</td></tr>
+<tr><th><kbd>Ctrl</kbd>＋<kbd>Z</kbd> / ＋<kbd>Shift</kbd></th><td>元に戻す / やり直す</td><td>1ドット修正</td></tr>
+<tr><th>矢印キー / <kbd>Space</kbd></th><td>座標を動かす / その1ドットに適用</td><td>1ドット修正（絵をクリックしてから）</td></tr>
+</tbody></table>
+<p>Mac では <kbd>Ctrl</kbd> のかわりに <kbd>⌘</kbd>、<kbd>Alt</kbd> のかわりに <kbd>Option</kbd> です。</p>
+</section>
+
+<section id="trouble"><h2><span class="num">07</span>うまくいかないとき</h2>
+<h3>画像を入れても何も起きない</h3>
+<ul>
+<li>入れる枠の色を見てください。<b>赤い枠</b>なら、理由が枠の中に出ています。</li>
+<li>「PNGではない」と出たら、PNGで保存し直してください。</li>
+<li>「大きすぎます」と出たら、1辺4096px以内に縮めてください。</li>
+<li>「前の処理が終わってから」と出たら、読み込みや変換が終わってからもう一度入れてください。</li>
+</ul>
+<h3>「大きさの違うものがあります」と出る</h3>
+<p>一度に選んだ画像の中に、キャンバスサイズの違うものが混ざっています。連番は全コマ同じ大きさにしてから入れてください。</p>
+<h3>背景が抜けない・服まで欠ける</h3>
+<p>背景と服の色が近いと、欠けることがあります。「背景」を「維持する」にするか、元の画像の背景を服に使っていない単色にしてください。</p>
+<h3>グリーンバックを抜く</h3>
+<ol>
+<li>「背景」を<b>グリーンバック等</b>にします。</li>
+<li><b>1コマ目の四隅から取る</b>を押すと、下地の色がそのまま入ります。動画生成の緑はぴったり #00FF00 ではないことが多いので、取るのが確実です。「グリーン」「放送用グリーン」「ブルー」「中性グレー」のボタンでも選べます。</li>
+<li><b>許容範囲</b>で抜き具合を調整します。キャラクターが欠けたら下げる、下地が残ったら上げる。</li>
+<li><b>縁の色かぶりを消す</b>は、輪郭のまわり2pxに残る緑みを抜きます。内側の緑の服はそのままです。緑の小物が輪郭にかかって灰色っぽくなるときだけオフにしてください。</li>
+</ol>
+<p>「自動で透過」でも緑は抜けますが、輪郭に緑のふちが残りがちです。試験用のコマでは、自動だと鮮やかな緑が4コマで170画素残り、色を指定すると0画素でした。</p>
+<h3>輪郭が荒れる・黒い点が出る</h3>
+<p>処理方法を「イラストをドット化」にしてみてください。「3つの処理方法を比較」で並べて選ぶのが確実です。</p>
+<h3>歩かせると上下に跳ねる・大きさが変わる</h3>
+<p>このツールは、全コマを同じ基準で処理するので、変換でずれることはありません。ずれは元の画像にあります。<a href="index.html#agent">コマの作り方と指示文</a>を見てください。1枚ずつ描かせたコマは、足元が4〜5pxずれることがあります。</p>
+<h3>ドットがちらちらする</h3>
+<p>結果の帯の右側の「ちらつき」の数が多いときは、「ちらつきを消す」を入れて変換し直してください。動画から作った連番で起きやすく、見本のネコは1コマあたり36から1に減りました。</p>
+<h3>前の結果が消えた</h3>
+<p>結果はこのブラウザにだけ保存されます（直近5件）。閲覧データを消したり、別のブラウザで開いたりすると残っていません。要るものは書き出して保存してください。</p>
+<h3>「このブラウザでは動きません」と出る</h3>
+<p>Chrome・Edge・Firefox・Safari の新しい版で開いてください。</p>
+</section>
+
+<section id="data"><h2><span class="num">08</span>画像の扱い</h2>
+<ul>
+<li>変換はすべて<b>このブラウザの中</b>で行われます。画像がサーバーへ送られることはありません。</li>
+<li>結果と編集中の内容は、このブラウザの中に保存されます。ほかの人からは見えません。</li>
+<li>書き出した画像は、商用利用OK・クレジット表記不要です（<a href="../terms.html">利用条件</a>）。</li>
+<li>画像処理には、オープンソースの <a href="https://github.com/HappyOnigiri/PixelRefiner" target="_blank" rel="noreferrer">PixelRefiner</a>（MIT / © Happy Onigiri）を使っています。<a href="../LICENSES.txt" target="_blank">ライセンス表記</a></li>
+</ul>
+</section>
+
+<p class="back-links"><a href="index.html">制作画面へ →</a><a href="pixel-editor.html">1ドット修正へ →</a><a href="../">このツールについて →</a></p>
+</main>
+<footer><span>Pixel Motion Studio</span><span>Powered by <a href="https://github.com/HappyOnigiri/PixelRefiner" target="_blank" rel="noreferrer">PixelRefiner</a> · © 2026 Happy Onigiri · <a href="../LICENSES.txt" target="_blank">Licenses</a></span></footer>
+</body></html>

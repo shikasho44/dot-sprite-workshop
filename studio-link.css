@@ -1,0 +1,16 @@
+.workshop-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 1.2rem;
+}
+.workshop-links a, .workshop-links button {
+  border: 1px solid currentColor;
+  padding: .5rem .75rem;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.workshop-links p { font-size: .875rem; margin: 0; }
