@@ -6,13 +6,16 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 import json
 import os
-from pathlib import Path
 import re
 import secrets
+import sqlite3
 import sys
 import threading
 from time import perf_counter
 import webbrowser
+from urllib.parse import parse_qs, urlsplit
+
+import projects
 
 from runtime_paths import ROOT as HERE, PIXEL, UBA, TRANSLATION, choose_device
 MODELS = {'pixelart-50m': 32, 'ubanova-16': 16}
@@ -162,6 +165,8 @@ PAGES = {
     '/motion.js': (HERE / 'motion.js', 'text/javascript; charset=utf-8'),
     '/handoff.js': (HERE / 'handoff.js', 'text/javascript; charset=utf-8'),
     '/workshop-link.js': (HERE / 'workshop-link.js', 'text/javascript; charset=utf-8'),
+    '/project-api.js': (HERE / 'project-api.js', 'text/javascript; charset=utf-8'),
+    '/project-panel.js': (HERE / 'project-panel.js', 'text/javascript; charset=utf-8'),
     '/studio-link.js': (HERE / 'studio-link.js', 'text/javascript; charset=utf-8'),
     '/studio-link.css': (HERE / 'studio-link.css', 'text/css; charset=utf-8'),
     **{f'/sample/{i}.png': (HERE / f'samples/chest_{i}.png', 'image/png') for i in range(1, 5)},
@@ -192,6 +197,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_error(403)
         elif self.path == '/health':
             self.send_json(200, {'app': 'pixel-sprite-maker'})
+        elif self.path == '/projects' or self.path.startswith('/projects/'):
+            self.get_projects()
         elif self.path == '/capabilities':
             from motion import studio_cli
             from reference import editing_available
@@ -227,6 +234,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path in {'/motion-preview', '/motion-export', '/motion-frames'}:
             self.do_motion()
+            return
+        if self.path in {'/projects', '/projects/studio'}:
+            self.post_projects()
             return
         if self.path not in {'/generate', '/generate-from-image', '/reference-preview'}:
             self.send_error(404)
@@ -268,7 +278,57 @@ class Handler(BaseHTTPRequestHandler):
             print(f'Generation failed: {exc}', file=sys.stderr, flush=True)
             self.send_json(500, {'error': '生成に失敗しました。起動ウィンドウのログを確認してから、もう一度お試しください。'})
             return
+        if 'project' in payload:
+            try:
+                original = {'data': image, 'name': payload.get('image_name')} if image_mode else None
+                result['history_id'] = projects.save_generation(
+                    payload['project'], prompt.strip() if isinstance(prompt, str) else '', result, original)
+            except (ValueError, OSError, sqlite3.Error) as exc:
+                print(f'Could not save generation: {exc}', file=sys.stderr, flush=True)
+                result['history_error'] = '候補を作成しました。履歴に保存できなかったので、必要なPNGを保存してください。'
         self.send_json(200, result)
+
+    def get_projects(self):
+        url = urlsplit(self.path)
+        try:
+            history = re.fullmatch(r'/projects/([1-9][0-9]{0,17})/history', url.path)
+            entry = re.fullmatch(r'/projects/entries/([1-9][0-9]{0,17})', url.path)
+            if url.path == '/projects':
+                self.send_json(200, projects.list_projects())
+            elif history:
+                raw = parse_qs(url.query).get('before', [''])[0]
+                if raw and not re.fullmatch(r'[1-9][0-9]{0,17}', raw):
+                    raise ValueError()
+                self.send_json(200, projects.list_history(int(history[1]), int(raw) if raw else None))
+            elif entry:
+                item = projects.get_entry(int(entry[1]))
+                self.send_json(200 if item else 404, item or {'error': '保存した作業が見つかりません。'})
+            else:
+                self.send_error(404)
+        except ValueError:
+            self.send_json(400, {'error': '履歴の番号を確認してください。'})
+        except (OSError, sqlite3.Error):
+            self.send_json(500, {'error': '履歴を開けません。dataフォルダの権限を確認してください。'})
+
+    def post_projects(self):
+        try:
+            size = int(self.headers.get('Content-Length', '0'))
+            limit = 4096 if self.path == '/projects' else projects.MAX_STUDIO_BYTES
+            if self.headers.get_content_type() != 'application/json' or not 0 < size <= limit:
+                self.send_json(413, {'error': '保存できるデータ量を超えています。コマ数か画像サイズを減らしてください。'})
+                return
+            request = json.loads(self.rfile.read(size))
+            if not isinstance(request, dict):
+                raise ValueError('保存する内容を確認してください。')
+            if self.path == '/projects':
+                new_id = projects.create_project(request.get('name'))
+            else:
+                new_id = projects.save_studio(request)
+            self.send_json(201, {'id': new_id})
+        except ValueError as exc:
+            self.send_json(422, {'error': str(exc)})
+        except (OSError, sqlite3.Error):
+            self.send_json(500, {'error': '保存できません。dataフォルダの書き込み権限と空き容量を確認してください。'})
 
     def do_motion(self):
         from motion import frame_sequence, motion_frames, preview, studio_zip

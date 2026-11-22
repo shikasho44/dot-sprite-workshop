@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ドット絵工房</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/project-api.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/motion.js" defer></script>
   <script src="/handoff.js" defer></script>
+  <script src="/project-panel.js" defer></script>
   <script src="/workshop-link.js" defer></script>
 </head>
 <body>
@@ -20,6 +22,23 @@
         <a href="/studio/app/">Pixel Motion Studioを開く</a>
       </div>
     </header>
+    <section class="project-desk" id="projects" aria-labelledby="project-title">
+      <h2 id="project-title">プロジェクト</h2>
+      <div class="project-controls">
+        <div><label for="project-select">作業先</label> <select id="project-select"></select></div>
+        <form id="project-create">
+          <label for="project-name">新しいプロジェクト名</label>
+          <input id="project-name" name="project-name" maxlength="60" required>
+          <button type="submit">作成</button>
+        </form>
+      </div>
+      <details>
+        <summary>保存した作業</summary>
+        <ol id="project-history" aria-label="作業履歴"></ol>
+        <button id="project-more" type="button" hidden>さらに表示</button>
+      </details>
+      <p id="project-status" role="status"></p>
+    </section>
     <div class="workspace">
       <form id="generator" autocomplete="off">
         <fieldset id="workbench" class="source-mode" tabindex="-1">
@@ -51,7 +70,7 @@
         <button id="submit" class="primary" type="submit">4案を生成</button>
       </form>
       <section class="results" aria-labelledby="results-title">
-        <div class="result-head"><h2 id="results-title">候補</h2><p id="status" role="status" aria-live="polite">見本 · pixelart-50m</p></div>
+        <div class="result-head"><h2 id="results-title" tabindex="-1">候補</h2><p id="status" role="status" aria-live="polite">見本 · pixelart-50m</p></div>
         <p id="translation" class="translation" hidden>画像生成に使った英訳 <span lang="en"></span></p>
         <p id="studio-handoff-status" role="status"></p>
         <div id="results" class="tiles" aria-busy="false"></div>

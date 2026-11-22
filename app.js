@@ -102,6 +102,35 @@ function referenceData(file) {
   });
 }
 
+function setReferenceFile(file) {
+  const selection = new DataTransfer();
+  selection.items.add(file);
+  referenceInput.files = selection.files;
+  referenceInput.dispatchEvent(new Event('change', {bubbles: true}));
+}
+
+function showGeneration(data) {
+  showBatches(data);
+  translation.querySelector('span').textContent = data.translation || '';
+  translation.hidden = !data.translation;
+}
+
+function restoreGeneration(saved) {
+  const data = saved.result;
+  const reference = data.model === 'reference';
+  document.querySelector(reference ? 'input[value="reference"]' : 'input[value="text"]').checked = true;
+  if (!reference) document.querySelector('input[name="model"][value="' + CSS.escape(data.model) + '"]').checked = true;
+  referenceInput.value = '';
+  if (reference && saved.input?.data) {
+    const file = projectAPI.files([{data: saved.input.data, name: saved.input.name || 'reference.png'}])[0];
+    setReferenceFile(file);
+  }
+  promptField.value = saved.prompt || '';
+  status.classList.remove('error');
+  syncGenerator();
+  showGeneration(data);
+}
+
 results.replaceChildren(...makeTiles(Array.from({length: 4}, (_, i) => `/sample/${i + 1}.png`), 'sample-chest'));
 
 function syncGenerator() {
@@ -161,16 +190,20 @@ form.addEventListener('submit', async event => {
   status.textContent = isReference ? (previewOnly ? '変換見本を作成中…' : '画像をもとに4案を生成中…')
     : '処理中… 初回はモデルを読み込みます';
   try {
-    const request = isReference ? {prompt, image: await referenceData(file)} : {model: values.get('model'), prompt};
+    await projectReady;
+    const project = activeProject();
+    const request = isReference ? {prompt, image: await referenceData(file), image_name: file.name}
+      : {model: values.get('model'), prompt};
+    if (project) request.project = project;
     const endpoint = isReference ? (previewOnly ? '/reference-preview' : '/generate-from-image') : '/generate';
     const response = await fetch(endpoint, {
       method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(request),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
-    showBatches(data);
-    translation.querySelector('span').textContent = data.translation || '';
-    translation.hidden = !data.translation;
+    showGeneration(data);
+    if (data.history_id && activeProject() === project) await showHistory();
+    if (data.history_error) projectStatus.textContent = data.history_error;
   } catch (error) {
     status.classList.add('error');
     status.textContent = error instanceof TypeError ? '接続が切れました。起動ウィンドウを確認してください。' : error.message;

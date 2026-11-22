@@ -106,6 +106,16 @@ async function loadMotionImage(source) {
   }
 }
 
+async function restoreMotion(saved) {
+  motionEffect.value = saved.effect;
+  motionDialog.showModal();
+  await loadMotionImage('data:image/png;base64,' + saved.image);
+  if (!motion || saved.mask.length !== motion.mask.length) throw new Error('保存した範囲を復元できませんでした。');
+  motion.mask.set(Array.from(saved.mask, Number));
+  drawSelection();
+  motionStatus.textContent = '元画像と動かす範囲を復元しました。';
+}
+
 document.querySelector('#motion-open').addEventListener('click', () => motionDialog.showModal());
 document.querySelector('#motion-close').addEventListener('click', () => motionDialog.close());
 document.querySelector('#results').addEventListener('click', event => {
@@ -195,6 +205,7 @@ motionCanvas.addEventListener('keydown', event => {
 });
 
 async function submitMotion(action) {
+  const project = activeProject();
   const revision = motionRevision;
   const payload = {image: motion.encoded, effect: motionEffect.value, mask: motion.mask.join('')};
   motionControls.disabled = true;
@@ -228,7 +239,7 @@ async function submitMotion(action) {
         name: `frame-${String(index).padStart(3, '0')}.png`,
         data: frame,
       }));
-      spriteHandoff.send('studio', files, data.fps);
+      await projectAPI.sendStudio(project, 'Studioへ渡したモーション · ' + files.length + 'コマ', files, data.fps, payload);
     } else {
       const data = await response.json();
       if (revision !== motionRevision) return;

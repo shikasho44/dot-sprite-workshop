@@ -45,7 +45,8 @@ def studio_asset(request):
         page = page.replace(
             '</head>',
             '<link rel="stylesheet" href="/studio-link.css">'
-            '<script src="/handoff.js" defer></script><script src="/studio-link.js" defer></script></head>',
+            '<script src="/handoff.js" defer></script><script src="/project-api.js" defer></script>'
+            '<script src="/studio-link.js" defer></script></head>',
             1,
         )
         data = page.encode('utf-8')

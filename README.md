@@ -4,7 +4,7 @@
 
 ## 最初の1回だけ
 
-1. [GitHubのReleases](https://github.com/shikasho44/dot-sprite-workshop/releases/latest)から、Assets欄の `Dot-Sprite-Workshop-Windows-v0.1.0.zip` を保存し、右クリックから「すべて展開」します。
+1. [GitHubのReleases](https://github.com/shikasho44/dot-sprite-workshop/releases/latest)から、Assets欄の `Dot-Sprite-Workshop-Windows-v0.2.0.zip` を保存し、右クリックから「すべて展開」します。
 2. [Python 3.12.10のWindows installer (64-bit)](https://www.python.org/downloads/release/python-31210/#files) をインストールします。インストール画面で `py launcher` を有効にしてください。すでに64ビットのPython 3.12と `py` があればこの手順を省けます。
 3. 展開したフォルダの **Setup.cmd** をダブルクリックします。まず **C** を選ぶとCPUで動きます。CUDA 13に対応するNVIDIA GPUとドライバーがある場合は **N** を選ぶと高速化できます。
 4. `Setup complete` が出たら、同じフォルダの **Start.cmd** をダブルクリックします。ブラウザで開かなければ [ドット絵工房](http://127.0.0.1:8765/) を開きます。
@@ -20,6 +20,16 @@ Windows 10/11のx64を対象にしています。セットアップ時はイン�
 - **工房へ戻す**　同梱のStudioでコマを選んで「選択中のコマをドット絵工房へ」を押すと、工房の画像入力に読み込まれます。GIF・PNGシート・ZIPはStudioから書き出せます。
 
 両アプリの往復には、工房から開いた同梱版のPixel Motion Studioを使います。Node.jsが入っているPCでは、工房のプレビューからもStudio CLIで直接ZIPを書き出せます。
+
+## 生成履歴とプロジェクト
+
+画面上の「プロジェクト」で作業先を選ぶか、名前を入れて作成します。ブラウザで生成した候補は、入力した指示・英訳・シード・元画像と一緒に自動で保存されます。
+
+- **候補を開き直す**　「保存した作業」を開き、対象の「候補を開き直す」を押します。保存したPNGがそのまま表示されます。
+- **連番を開き直す**　Studioへ渡したPNG連番とFPSは自動保存されます。「Studioで開き直す」を押すと再開できます。「動かす範囲を開く」からは、工房側の元画像と選択範囲に戻れます。
+- **Studioでの変更を残す**　Studioのメイン画面で「Studioの作業を保存」を押すと、コマ順、選択中のコマ、FPSと設定を履歴に追加します。処理済みの結果を保存した場合は、そのPNGから再開します。1ドット修正画面の編集はStudioの保存・書き出しで確定してください。
+
+プロジェクトはアプリの `data/projects.sqlite3` にあります。バックアップや更新でフォルダを移すときは、工房を終了してから `data` をコピーしてください。v0.1.0をセットアップ済みの場合、同じ `data` を新しいフォルダにコピーすれば、モデルを再取得せず起動できます。
 
 ## 画像をAIで描き直す場合
 
